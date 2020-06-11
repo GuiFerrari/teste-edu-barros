@@ -14,7 +14,7 @@ export default createGlobalStyle`
     -webkit-font-smoothing: antialised;
   }
 
-  body, input, button {
+  body, input, textarea, button {
     font-family: 'Open Sans', sans-serif;
     font-size: 16px;
   }

@@ -8,14 +8,14 @@ export const Container = styled.div`
   height: 100vh;
 `;
 
-const appearFromLeft = keyframes`
+const appearFromTop = keyframes`
   from {
     opacity: 0;
-    transform: translateX(-50px);
+    transform: translateY(-50px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 `;
 
@@ -25,7 +25,7 @@ export const AnimationContainer = styled.div`
   justify-content: center;
   align-items: center;
 
-  animation: ${appearFromLeft} 1s;
+  animation: ${appearFromTop} 1s;
 
   form {
     margin: 80px 0;
