@@ -13,6 +13,7 @@
     "@types/yup": "^0.29.2",
     "@unform/core": "^2.1.0",
     "@unform/web": "^2.1.0",
+    "cpf-cnpj-validator": "^1.0.2",
     "polished": "^3.6.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

@@ -5,7 +5,8 @@ export const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
 `;
 
 const appearFromTop = keyframes`
@@ -67,4 +68,10 @@ export const AnimationContainer = styled.div`
       color: ${shade(0.2, '#ff9000')};
     }
   }
+`;
+
+export const BoxUser = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 `;

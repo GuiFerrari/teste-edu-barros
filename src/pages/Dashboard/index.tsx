@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
 import {
   FiUser,
   FiCalendar,
@@ -10,11 +10,13 @@ import {
 } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
+import { cpf } from 'cpf-cnpj-validator';
 import * as Yup from 'yup';
 
-import { Container, AnimationContainer } from './styles';
+import { Container, AnimationContainer, BoxUser } from './styles';
 
 import getValidationErrors from '../../utils/getValidationErrors';
+import Regex from '../../utils/regex';
 
 import Input from '../../components/Input';
 import Textarea from '../../components/Textarea';
@@ -32,16 +34,33 @@ interface FormData {
 }
 
 const Dashboard: React.FC = () => {
+  const [users, setUsers] = useState<FormData[]>([]);
   const formRef = useRef<FormHandles>(null);
+
+  useEffect(() => {
+    const local = localStorage.getItem('@TestEdu:users');
+    let localParsed: FormData[] = [];
+    if (typeof local === 'string') {
+      localParsed = JSON.parse(local);
+    }
+
+    setUsers(localParsed);
+  }, []);
 
   const handleSubmit = useCallback(async (data: FormData) => {
     try {
       formRef.current?.setErrors({});
 
       const schema = Yup.object().shape({
-        name: Yup.string().required('Nome obrigatório'),
-        birth: Yup.string().required('Data de nascimento obrigatório'),
-        cpf: Yup.string().required('CPF obrigatório'),
+        name: Yup.string()
+          .required('Nome obrigatório')
+          .matches(/^[a-z]+$/, 'Digite apenas letras'),
+        birth: Yup.string()
+          .required('Data de nascimento obrigatório')
+          .matches(Regex.date, 'Digite uma data válida'),
+        cpf: Yup.string()
+          .required('CPF obrigatório')
+          .matches(Regex.cpf, 'Digite um CPF válido'),
         phone: Yup.string().required('Celular obrigatório'),
         email: Yup.string()
           .email('Digite um e-mail válido')
@@ -53,7 +72,27 @@ const Dashboard: React.FC = () => {
         abortEarly: false,
       });
 
-      console.log('tudo certo');
+      if (!cpf.isValid(data.cpf)) {
+        formRef.current?.setErrors({
+          cpf: 'Digite um CPF válido',
+        });
+        throw new Error();
+      }
+
+      const dataString = JSON.stringify(data);
+
+      setUsers(oldUsers => [...oldUsers, JSON.parse(dataString)]);
+
+      const local = localStorage.getItem('@TestEdu:users');
+      let localParsed: FormData[] = [];
+      if (typeof local === 'string') {
+        localParsed = JSON.parse(local);
+      }
+
+      localParsed.push(data);
+
+      localStorage.setItem('@TestEdu:users', JSON.stringify(localParsed));
+      formRef.current?.reset();
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
@@ -64,49 +103,61 @@ const Dashboard: React.FC = () => {
   }, []);
 
   return (
-    <Container>
-      <AnimationContainer>
-        <Form ref={formRef} onSubmit={handleSubmit}>
-          <h1>Faça seu login</h1>
+    <>
+      <Container>
+        <AnimationContainer>
+          <Form ref={formRef} onSubmit={handleSubmit}>
+            <h1>Faça seu login</h1>
 
-          <Input name="name" icon={FiUser} placeholder="Nome" />
+            <Input name="name" icon={FiUser} placeholder="Nome" />
 
-          <InputMask
-            mask="99/99/9999"
-            name="birth"
-            icon={FiCalendar}
-            placeholder="Data de nascimento"
-          />
+            <InputMask
+              mask="99/99/9999"
+              name="birth"
+              icon={FiCalendar}
+              placeholder="Data de nascimento"
+            />
 
-          <InputMask
-            mask="999.999.999-99"
-            name="cpf"
-            icon={FiFileText}
-            placeholder="CPF"
-          />
+            <InputMask
+              mask="999.999.999-99"
+              name="cpf"
+              icon={FiFileText}
+              placeholder="CPF"
+            />
 
-          <InputMask
-            mask="(99) 99999-9999"
-            name="phone"
-            icon={FiPhone}
-            placeholder="Celular"
-          />
+            <InputMask
+              mask="(99) 99999-9999"
+              name="phone"
+              icon={FiPhone}
+              placeholder="Celular"
+            />
 
-          <Input name="email" icon={FiMail} placeholder="Email" />
+            <Input name="email" icon={FiMail} placeholder="Email" />
 
-          <Input name="address" icon={FiMapPin} placeholder="Endereço" />
+            <Input name="address" icon={FiMapPin} placeholder="Endereço" />
 
-          <Textarea
-            name="obs"
-            icon={FiAlertCircle}
-            placeholder="Observações"
-            maxLength={300}
-          />
+            <Textarea
+              name="obs"
+              icon={FiAlertCircle}
+              placeholder="Observações"
+              maxLength={300}
+            />
 
-          <Button type="submit">Entrar</Button>
-        </Form>
-      </AnimationContainer>
-    </Container>
+            <Button type="submit">Entrar</Button>
+          </Form>
+        </AnimationContainer>
+      </Container>
+      {users &&
+        users.map((user, index) => {
+          return (
+            // Desabilitada regra do ESLINT para usar o Index como Key, já que não tenho um ID
+            // eslint-disable-next-line react/no-array-index-key
+            <BoxUser key={index}>
+              <h1>{user.name}</h1>
+            </BoxUser>
+          );
+        })}
+    </>
   );
 };
 
