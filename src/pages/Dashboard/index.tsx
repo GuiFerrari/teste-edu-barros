@@ -7,6 +7,7 @@ import {
   FiMail,
   FiMapPin,
   FiAlertCircle,
+  FiXCircle,
 } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
@@ -102,12 +103,28 @@ const Dashboard: React.FC = () => {
     }
   }, []);
 
+  const handleDelete = useCallback(
+    (user: FormData): void => {
+      const array = users;
+      const indexOf = array.indexOf(user);
+
+      if (indexOf > -1) {
+        array.splice(indexOf, 1);
+      }
+
+      localStorage.setItem('@TestEdu:users', JSON.stringify(array));
+
+      setUsers(users.filter(item => item !== user));
+    },
+    [users],
+  );
+
   return (
     <>
       <Container>
         <AnimationContainer>
           <Form ref={formRef} onSubmit={handleSubmit}>
-            <h1>Faça seu login</h1>
+            <h1>Cadastrar usuário</h1>
 
             <Input name="name" icon={FiUser} placeholder="Nome" />
 
@@ -143,20 +160,47 @@ const Dashboard: React.FC = () => {
               maxLength={300}
             />
 
-            <Button type="submit">Entrar</Button>
+            <Button type="submit">Cadastrar</Button>
           </Form>
         </AnimationContainer>
       </Container>
-      {users &&
-        users.map((user, index) => {
-          return (
-            // Desabilitada regra do ESLINT para usar o Index como Key, já que não tenho um ID
-            // eslint-disable-next-line react/no-array-index-key
-            <BoxUser key={index}>
-              <h1>{user.name}</h1>
-            </BoxUser>
-          );
-        })}
+      <BoxUser>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Data de nascimento</th>
+            <th>CPF</th>
+            <th>Telefone</th>
+            <th>Email</th>
+            <th>Endereço</th>
+            <th>Obs</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users &&
+            users.map((user, index) => {
+              return (
+                // Desabilitada regra do ESLINT para usar o Index como Key, já que não tenho um ID
+                // eslint-disable-next-line react/no-array-index-key
+                <tr className="box" key={index}>
+                  <td>{user.name}</td>
+                  <td>{user.birth}</td>
+                  <td>{user.cpf}</td>
+                  <td>{user.phone}</td>
+                  <td>{user.email}</td>
+                  <td>{user.address}</td>
+                  <td>{user.obs}</td>
+                  <td>
+                    <button type="button" onClick={() => handleDelete(user)}>
+                      <FiXCircle />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+        </tbody>
+      </BoxUser>
     </>
   );
 };

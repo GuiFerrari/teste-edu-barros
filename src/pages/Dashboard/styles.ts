@@ -5,7 +5,6 @@ export const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
   height: auto;
 `;
 
@@ -70,8 +69,46 @@ export const AnimationContainer = styled.div`
   }
 `;
 
-export const BoxUser = styled.div`
+export const BoxUser = styled.table`
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  background: #fff;
+  padding: 20px;
+  color: #666360;
+  border-radius: 10px;
+  animation: ${appearFromTop} 1s;
+
+  thead {
+    tr {
+      text-align: left;
+      th {
+        padding-bottom: 20px;
+      }
+    }
+  }
+
+  tbody {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #666360;
+
+    tr {
+      td {
+        button {
+          background: #ff9000;
+          border: none;
+          padding: 6px 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s;
+
+          &:hover {
+            background: ${shade(0.2, '#ff9000')};
+          }
+        }
+      }
+    }
+  }
 `;
